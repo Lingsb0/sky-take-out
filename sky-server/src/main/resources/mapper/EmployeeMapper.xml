@@ -11,7 +11,7 @@
     </where>
     order by create_time desc
 </select>
-    <update id="update" >
+    <update id="update" parameterType="Employee">
         update employee
         <set>
             <if test="status != null">status = #{status},</if>
