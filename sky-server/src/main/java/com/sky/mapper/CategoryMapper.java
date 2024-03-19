@@ -41,7 +41,7 @@ public interface CategoryMapper {
      * 根据id修改分类
      * @param category
      */
-    @AutoFill(value = OperationType.INSERT)
+    @AutoFill(value = OperationType.UPDATE)
     void update(Category category);
 
     /**
