@@ -6,3 +6,9 @@ sky:
     database: sky_take_out
     username: root
     password: root
+  alioss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    access-key-id: LTAI5tQKEHLce7WvS7XFdZ8L
+    access-key-secret: wOPCHky7vj48JBbGGrNKZ8ntIHjgcU
+    #改成自己创建桶的名称
+    bucket-name: web-lingsb
