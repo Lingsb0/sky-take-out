@@ -25,4 +25,32 @@
         </where>
         order by d.create_time desc
     </select>
+    <resultMap id="dishMap" type="com.sky.vo.DishVO" autoMapping="true">
+        <result column="id" property="id"/>
+        <collection property="flavors" javaType="java.util.List" ofType="com.sky.entity.DishFlavor">
+            <result  column="fid" property="id"></result>
+            <result  column="fname" property="name"></result>
+            <result  column="fvalue" property="value"></result>
+        </collection>
+    </resultMap>
+    <select id="getByIdWithFlavors"  resultMap="dishMap">
+        select d.* ,df.id fid,df.name fname ,df.value fvalue
+        from dish d left join dish_flavor df on d.id = df.dish_id
+        where d.id=#{id}
+    </select>
+
+    <update id="update">
+        update dish
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

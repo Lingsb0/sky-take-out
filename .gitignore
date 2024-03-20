@@ -1,6 +1,7 @@
 **/target/
 .idea
 *.iml
+*.yml
 *.class
 *Test.java
 **/test/
