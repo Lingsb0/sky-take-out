@@ -31,4 +31,59 @@
         </where>
         order by s.create_time desc
     </select>
+    <resultMap id="setmealAndDishMap" type="com.sky.vo.SetmealVO" autoMapping="true">
+        <result column="id" property="id"/>
+        <collection property="setmealDishes" ofType="SetmealDish">
+            <result column="sd_id" property="id"/>
+            <result column="setmeal_id" property="setmealId"/>
+            <result column="dish_id" property="dishId"/>
+            <result column="sd_name" property="name"/>
+            <result column="sd_price" property="price"/>
+            <result column="copies" property="copies"/>
+        </collection>
+    </resultMap>
+    <select id="getByIdWithDish" parameterType="long" resultMap="setmealAndDishMap">
+        select a.*,
+               b.id    sd_id,
+               b.setmeal_id,
+               b.dish_id,
+               b.name  sd_name,
+               b.price sd_price,
+               b.copies
+        from setmeal a
+                 left join
+             setmeal_dish b
+             on
+                 a.id = b.setmeal_id
+        where a.id = #{id}
+    </select>
+
+    <update id="update">
+        update setmeal
+        <set>
+            <if test="name!=null and name !=''">
+                name =#{name},
+            </if>
+            <if test="price !=null">
+                price= #{price},
+            </if>
+            <if test="status!=null">
+                status=#{status},
+            </if>
+            <if test="description!=null">
+                description=#{description},
+            </if>
+
+            <if test="image!=null">
+                image=#{image},
+            </if>
+            <if test="updateTime!=null">
+                update_time=#{updateTime},
+            </if>
+            <if test="updateUser!=null">
+                update_user=#{updateUser},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
 </mapper>
