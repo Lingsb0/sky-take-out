@@ -19,6 +19,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -55,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
     private AddressBookMapper addressBookMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -88,8 +91,10 @@ public class OrderServiceImpl implements OrderService {
         order.setConsignee(addressBook.getConsignee());
         order.setNumber(String.valueOf(System.currentTimeMillis()));
         order.setUserId(userId);
-        order.setStatus(Orders.PENDING_PAYMENT);
-        order.setPayStatus(Orders.UN_PAID);
+        //order.setStatus(Orders.PENDING_PAYMENT);
+        //order.setPayStatus(Orders.UN_PAID);
+        order.setStatus(Orders.TO_BE_CONFIRMED);
+        order.setPayStatus(Orders.PAID);
         order.setOrderTime(LocalDateTime.now());
 
         //向订单表插入1条数据
@@ -117,6 +122,15 @@ public class OrderServiceImpl implements OrderService {
                 .orderAmount(order.getAmount())
                 .orderTime(order.getOrderTime())
                 .build();
+        //推送消息
+        Map map = new HashMap();
+        map.put("type", 1);//消息类型，1表示来单提醒
+        map.put("orderId", order.getId());
+        map.put("content", "订单号：" + order.getNumber());
+
+        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+        ///////////////////////////////////////////////////
 
         return orderSubmitVO;
     }
@@ -491,5 +505,24 @@ public class OrderServiceImpl implements OrderService {
         orders.setDeliveryTime(LocalDateTime.now());
 
         orderMapper.update(orders);
+    }
+    /**
+     * 用户催单
+     *
+     * @param id
+     */
+    public void reminder(Long id) {
+        // 查询订单是否存在
+        Orders orders = orderMapper.getById(id);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        //基于WebSocket实现催单
+        Map map = new HashMap();
+        map.put("type", 2);//2代表用户催单
+        map.put("orderId", id);
+        map.put("content", "订单号：" + orders.getNumber());
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 }
