@@ -48,4 +48,13 @@ public interface OrderMapper {
      */
     @Select("select count(id) from orders where status = #{status}")
     Integer countStatus(Integer status);
+    /**
+     * 根据状态和下单时间查询订单
+     * @param status
+     * @param orderTime
+     */
+    //15分钟未支付：select * from orders where status = 1(待付款) and order_time < 当前时间-15分钟
+    //派送中超时：select * from orders where status = 4(派送中) and order_time < 当前时间-1小时
+    @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
+    List<Orders> getByStatusAndOrdertimeLT(Integer status, LocalDateTime orderTime);
 }
