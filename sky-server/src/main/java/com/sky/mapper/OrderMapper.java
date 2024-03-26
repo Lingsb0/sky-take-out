@@ -57,9 +57,10 @@ public interface OrderMapper {
     //派送中超时：select * from orders where status = 4(派送中) and order_time < 当前时间-1小时
     @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndOrdertimeLT(Integer status, LocalDateTime orderTime);
-    /**
-     * 根据id查询订单
-     * @param id
-     */
 
+    /**
+     * 根据动态条件统计营业额
+     * @param map
+     */
+    Double sumByMap(Map map);
 }
